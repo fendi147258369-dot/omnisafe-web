@@ -6,9 +6,9 @@ export const metadata = {
   title: "OmniSafe AI",
   description: "Token risk facts and liquidity intelligence",
   icons: {
-    icon: "/icons/tubiao.png",
-    shortcut: "/icons/tubiao.png",
-    apple: "/icons/tubiao.png",
+    icon: "/icons/zhandian.png",
+    shortcut: "/icons/zhandian.png",
+    apple: "/icons/zhandian.png",
   },
 };
 

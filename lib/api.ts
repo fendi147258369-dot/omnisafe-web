@@ -1,5 +1,5 @@
 type FetchOptions = {
-  method?: "GET" | "POST";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: any;
   headers?: Record<string, string>;
 };

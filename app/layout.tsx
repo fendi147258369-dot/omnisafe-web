@@ -6,9 +6,13 @@ export const metadata = {
   title: "OmniSafe AI",
   description: "Token risk facts and liquidity intelligence",
   icons: {
-    icon: "/icons/zhandian.png",
-    shortcut: "/icons/zhandian.png",
-    apple: "/icons/zhandian.png",
+    icon: [
+      { url: "/icons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+    ],
+    shortcut: "/icons/favicon-32x32.png",
+    apple: "/icons/apple-touch-icon%20180x180.png",
   },
 };
 

@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { AppShell } from "../../../components/layout/AppShell";
 
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
+
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
@@ -50,7 +56,7 @@ export default function LoginPage() {
   const clientMissing = !GOOGLE_CLIENT_ID;
 
   const renderGoogleButton = useCallback(() => {
-    if (googleBtnRef.current && window.google?.accounts?.id?.renderButton) {
+    if (googleBtnRef.current && typeof window !== "undefined" && window.google?.accounts?.id?.renderButton) {
       googleBtnRef.current.innerHTML = "";
       window.google.accounts.id.renderButton(googleBtnRef.current, {
         theme: "outline",

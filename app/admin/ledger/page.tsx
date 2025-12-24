@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { AdminShell } from "../../../components/admin/AdminShell";
@@ -35,7 +36,7 @@ const formatLocal = (value: string | null | undefined) => {
   }).format(d);
 };
 
-export default function AdminLedgerPage() {
+function LedgerContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const userId = searchParams.get("user_id");
@@ -120,5 +121,13 @@ export default function AdminLedgerPage() {
         </div>
       )}
     </AdminShell>
+  );
+}
+
+export default function AdminLedgerPage() {
+  return (
+    <Suspense fallback={<div className="p-4 text-sm text-slate-600">加载中...</div>}>
+      <LedgerContent />
+    </Suspense>
   );
 }

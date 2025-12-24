@@ -18,6 +18,7 @@ type UserRow = {
   created_at?: string;
   last_login_at?: string;
   credits: number;
+  prepaid_credits?: number;
 };
 
 const planOptions = ["Pay-As-You-Go", "Explorer", "Analyst"];

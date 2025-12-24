@@ -4,7 +4,7 @@ type FetchOptions = {
   headers?: Record<string, string>;
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.omnisafe.info";
 
 const getToken = () => {
   if (typeof window === "undefined") return null;

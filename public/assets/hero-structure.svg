@@ -1,0 +1,45 @@
+<svg
+  width="600"
+  height="420"
+  viewBox="0 0 600 420"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+
+  <!-- 背景柔化网格 -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e3a8a" stroke-width="0.5" opacity="0.08" />
+    </pattern>
+
+    <!-- 渐变用于“洞察波纹” -->
+    <radialGradient id="focusRing" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="600" height="420" fill="url(#grid)" />
+
+  <!-- 洞察范围（像眼睛聚焦） -->
+  <circle cx="420" cy="210" r="140" stroke="url(#focusRing)" stroke-width="2"/>
+  <circle cx="420" cy="210" r="100" stroke="url(#focusRing)" stroke-width="2"/>
+  <circle cx="420" cy="210" r="60"  stroke="url(#focusRing)" stroke-width="2"/>
+
+  <!-- 轻量连接线 -->
+  <g opacity="0.25">
+    <line x1="360" y1="210" x2="420" y2="170" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="420" y1="210" x2="460" y2="250" stroke="#3b82f6" stroke-width="1"/>
+    <line x1="420" y1="210" x2="380" y2="240" stroke="#3b82f6" stroke-width="1"/>
+  </g>
+
+  <!-- 链上事件节点 -->
+  <g>
+    <circle cx="420" cy="210" r="5" fill="#2563eb"/>
+    <circle cx="380" cy="210" r="4" fill="#60a5fa" opacity="0.8"/>
+    <circle cx="420" cy="170" r="4" fill="#60a5fa" opacity="0.8"/>
+    <circle cx="460" cy="250" r="3" fill="#93c5fd" opacity="0.6"/>
+    <circle cx="390" cy="240" r="3" fill="#93c5fd" opacity="0.6"/>
+  </g>
+
+</svg>

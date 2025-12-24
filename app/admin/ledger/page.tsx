@@ -19,7 +19,7 @@ type LedgerItem = {
   telegram_id?: string | null;
 };
 
-const formatLocal = (value?: string | null) => {
+const formatLocal = (value: string | null | undefined) => {
   if (!value) return "";
   const hasTZ = /[zZ]|[+-]\d\d:?\d\d$/.test(value);
   const normalized = hasTZ ? value : `${value.replace(" ", "T")}Z`;

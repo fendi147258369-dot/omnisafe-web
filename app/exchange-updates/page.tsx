@@ -29,16 +29,15 @@ const COPY = {
     ],
   },
   cards: {
-    suffix: "· 今日新增",
-    listLabel: "新增交易对",
+    sortLabel: "默认排序",
+  },
+  sections: {
+    binance: "新增成交交易对",
+    okx: "新增永续合约",
+    bybit: "新增合约交易",
+    gate: "新增现货交易对",
   },
   list: {
-    headers: {
-      pair: "交易对",
-      market: "类型",
-      leverage: "杠杆",
-      listedAt: "上线时间",
-    },
     actionLabel: "查看检测",
     empty: "暂无更新",
   },
@@ -46,113 +45,220 @@ const COPY = {
 } as const;
 
 type Exchange = (typeof COPY.filters.exchanges)[number]["id"];
-type MarketTypeId = (typeof COPY.filters.types)[number]["id"];
-type TimeRangeId = (typeof COPY.filters.times)[number]["id"];
 
 type ExchangeUpdate = {
-  exchange: Exchange;
   token_symbol: string;
   pair_name: string;
   market_type: "现货" | "永续";
   leverage: string;
   listed_at: string;
   token_address: string;
+  meta?: string;
+};
+
+type ExchangeSection = {
+  title: string;
+  items: ExchangeUpdate[];
+};
+
+type ExchangeCard = {
+  exchange: Exchange;
+  sections: ExchangeSection[];
+  layout: "rows" | "panels";
 };
 
 const API_ENDPOINT = "/api/exchange-updates";
 
-const MOCK_UPDATES: ExchangeUpdate[] = [
+const MOCK_CARDS: ExchangeCard[] = [
   {
     exchange: "Binance",
-    token_symbol: "ZETA",
-    pair_name: "ZETA/USDT",
-    market_type: "现货",
-    leverage: "20x",
-    listed_at: "2 小时前",
-    token_address: "0x1111111111111111111111111111111111111111",
-  },
-  {
-    exchange: "Binance",
-    token_symbol: "OSHI",
-    pair_name: "OSHI/USDT",
-    market_type: "现货",
-    leverage: "10x",
-    listed_at: "3 小时前",
-    token_address: "0x2222222222222222222222222222222222222222",
-  },
-  {
-    exchange: "Binance",
-    token_symbol: "BONK",
-    pair_name: "BONK/USDT",
-    market_type: "永续",
-    leverage: "50x",
-    listed_at: "4 小时前",
-    token_address: "0x3333333333333333333333333333333333333333",
+    layout: "rows",
+    sections: [
+      {
+        title: COPY.sections.binance,
+        items: [
+          {
+            token_symbol: "ZETA",
+            pair_name: "ZETA/USDT",
+            market_type: "现货",
+            leverage: "20x",
+            listed_at: "2 小时前",
+            token_address: "0x1111111111111111111111111111111111111111",
+            meta: "Solana 链",
+          },
+          {
+            token_symbol: "OSHI",
+            pair_name: "OSHI/USDT",
+            market_type: "现货",
+            leverage: "10x",
+            listed_at: "3 小时前",
+            token_address: "0x2222222222222222222222222222222222222222",
+            meta: "ETH 链",
+          },
+          {
+            token_symbol: "BONK",
+            pair_name: "BONK/USDT",
+            market_type: "永续",
+            leverage: "50x",
+            listed_at: "4 小时前",
+            token_address: "0x3333333333333333333333333333333333333333",
+            meta: "Solana 链",
+          },
+        ],
+      },
+    ],
   },
   {
     exchange: "OKX",
-    token_symbol: "MAV",
-    pair_name: "MAV/USDT",
-    market_type: "永续",
-    leverage: "20x",
-    listed_at: "1 小时前",
-    token_address: "0x4444444444444444444444444444444444444444",
-  },
-  {
-    exchange: "OKX",
-    token_symbol: "SHIB1000",
-    pair_name: "SHIB1000/USDT",
-    market_type: "永续",
-    leverage: "25x",
-    listed_at: "1 小时前",
-    token_address: "0x5555555555555555555555555555555555555555",
+    layout: "panels",
+    sections: [
+      {
+        title: COPY.sections.okx,
+        items: [
+          {
+            token_symbol: "MAV",
+            pair_name: "MAV/USDT",
+            market_type: "永续",
+            leverage: "20x",
+            listed_at: "1 小时前",
+            token_address: "0x4444444444444444444444444444444444444444",
+          },
+          {
+            token_symbol: "SHIB1000",
+            pair_name: "SHIB1000/USDT",
+            market_type: "永续",
+            leverage: "25x",
+            listed_at: "1 小时前",
+            token_address: "0x5555555555555555555555555555555555555555",
+          },
+        ],
+      },
+      {
+        title: COPY.sections.okx,
+        items: [
+          {
+            token_symbol: "OKX",
+            pair_name: "OKX/USDT",
+            market_type: "永续",
+            leverage: "15x",
+            listed_at: "1 小时前",
+            token_address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          },
+          {
+            token_symbol: "MAV",
+            pair_name: "MAV/USDT",
+            market_type: "永续",
+            leverage: "20x",
+            listed_at: "1 小时前",
+            token_address: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          },
+        ],
+      },
+    ],
   },
   {
     exchange: "Bybit",
-    token_symbol: "ZRO",
-    pair_name: "ZRO/USDT",
-    market_type: "永续",
-    leverage: "10x",
-    listed_at: "3 小时前",
-    token_address: "0x6666666666666666666666666666666666666666",
-  },
-  {
-    exchange: "Bybit",
-    token_symbol: "GME",
-    pair_name: "GME/USDT",
-    market_type: "永续",
-    leverage: "5x",
-    listed_at: "5 小时前",
-    token_address: "0x7777777777777777777777777777777777777777",
+    layout: "panels",
+    sections: [
+      {
+        title: COPY.sections.bybit,
+        items: [
+          {
+            token_symbol: "ZRO",
+            pair_name: "ZRO/USDT",
+            market_type: "永续",
+            leverage: "10x",
+            listed_at: "3 小时前",
+            token_address: "0x6666666666666666666666666666666666666666",
+          },
+          {
+            token_symbol: "GME",
+            pair_name: "GME/USDT",
+            market_type: "永续",
+            leverage: "5x",
+            listed_at: "5 小时前",
+            token_address: "0x7777777777777777777777777777777777777777",
+          },
+        ],
+      },
+      {
+        title: COPY.sections.bybit,
+        items: [
+          {
+            token_symbol: "ZRO",
+            pair_name: "ZRO/USDT",
+            market_type: "永续",
+            leverage: "10x",
+            listed_at: "3 小时前",
+            token_address: "0x8888888888888888888888888888888888888888",
+          },
+          {
+            token_symbol: "GME",
+            pair_name: "GME/USDT",
+            market_type: "永续",
+            leverage: "5x",
+            listed_at: "5 小时前",
+            token_address: "0x9999999999999999999999999999999999999999",
+          },
+        ],
+      },
+    ],
   },
   {
     exchange: "Gate",
-    token_symbol: "VISTA",
-    pair_name: "VISTA/USDT",
-    market_type: "现货",
-    leverage: "10x",
-    listed_at: "6 小时前",
-    token_address: "0x8888888888888888888888888888888888888888",
-  },
-  {
-    exchange: "Gate",
-    token_symbol: "HYPE",
-    pair_name: "HYPE/USDT",
-    market_type: "现货",
-    leverage: "10x",
-    listed_at: "7 小时前",
-    token_address: "0x9999999999999999999999999999999999999999",
+    layout: "panels",
+    sections: [
+      {
+        title: COPY.sections.gate,
+        items: [
+          {
+            token_symbol: "VISTA",
+            pair_name: "VISTA/USDT",
+            market_type: "现货",
+            leverage: "10x",
+            listed_at: "6 小时前",
+            token_address: "0x1010101010101010101010101010101010101010",
+          },
+          {
+            token_symbol: "HYPE",
+            pair_name: "HYPE/USDT",
+            market_type: "现货",
+            leverage: "10x",
+            listed_at: "7 小时前",
+            token_address: "0x2020202020202020202020202020202020202020",
+          },
+        ],
+      },
+      {
+        title: COPY.sections.gate,
+        items: [
+          {
+            token_symbol: "LUNA",
+            pair_name: "LUNA/USDT",
+            market_type: "现货",
+            leverage: "10x",
+            listed_at: "8 小时前",
+            token_address: "0x3030303030303030303030303030303030303030",
+          },
+          {
+            token_symbol: "META",
+            pair_name: "META/USDT",
+            market_type: "现货",
+            leverage: "10x",
+            listed_at: "9 小时前",
+            token_address: "0x4040404040404040404040404040404040404040",
+          },
+        ],
+      },
+    ],
   },
 ];
 
-async function getExchangeUpdates(): Promise<ExchangeUpdate[]> {
-  return MOCK_UPDATES;
+async function getExchangeUpdates(): Promise<ExchangeCard[]> {
+  return MOCK_CARDS;
 }
 
-const EXCHANGE_META: Record<
-  Exchange,
-  { label: string; short: string; iconBg: string; text: string }
-> = {
+const EXCHANGE_META: Record<Exchange, { label: string; short: string; iconBg: string; text: string }> = {
   Binance: {
     label: "Binance",
     short: "B",
@@ -179,32 +285,37 @@ const EXCHANGE_META: Record<
   },
 };
 
-const truncatePair = (value: string) => value;
+const TOKEN_COLORS = [
+  "from-blue-500 to-indigo-500",
+  "from-emerald-500 to-teal-500",
+  "from-amber-500 to-orange-500",
+  "from-violet-500 to-fuchsia-500",
+];
 
-const marketBadgeClass = (type: ExchangeUpdate["market_type"]) =>
-  type === "现货"
-    ? "border-slate-200 bg-slate-100 text-slate-600"
-    : "border-indigo-200 bg-indigo-50 text-indigo-700";
+const getTokenColor = (symbol: string) => {
+  const sum = symbol.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  return TOKEN_COLORS[sum % TOKEN_COLORS.length];
+};
+
+const chunkItems = <T,>(items: T[], size: number) => {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
+};
+
+const buildMetaLine = (item: ExchangeUpdate) => {
+  const parts = [item.meta, item.market_type, item.leverage, item.listed_at].filter(Boolean);
+  return parts.join(" · ");
+};
 
 export default function ExchangeUpdatesPage() {
-  const [updates, setUpdates] = useState<ExchangeUpdate[]>([]);
-  const [selectedExchanges, setSelectedExchanges] = useState<Exchange[]>(
-    COPY.filters.exchanges.map((item) => item.id as Exchange)
-  );
-  const [selectedTypes, setSelectedTypes] = useState<MarketTypeId[]>(
-    COPY.filters.types.map((item) => item.id as MarketTypeId)
-  );
-  const [timeRange, setTimeRange] = useState<TimeRangeId>(COPY.filters.times[0].id);
+  const [cards, setCards] = useState<ExchangeCard[]>([]);
 
   useEffect(() => {
-    getExchangeUpdates().then(setUpdates);
+    getExchangeUpdates().then(setCards);
   }, []);
-
-  const grouped = COPY.filters.exchanges.map((exchange) => ({
-    exchange: exchange.id as Exchange,
-    label: exchange.label,
-    items: updates.filter((item) => item.exchange === exchange.id),
-  }));
 
   return (
     <AppShell>
@@ -226,94 +337,11 @@ export default function ExchangeUpdatesPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-          <div className="grid gap-4 lg:grid-cols-3">
-            <div className="space-y-2">
-              <div className="text-xs font-semibold text-slate-600">{COPY.filters.exchangeLabel}</div>
-              <div className="flex flex-wrap gap-2">
-                {COPY.filters.exchanges.map((exchange) => {
-                  const active = selectedExchanges.includes(exchange.id as Exchange);
-                  return (
-                    <button
-                      key={exchange.id}
-                      type="button"
-                      onClick={() =>
-                        setSelectedExchanges((prev) =>
-                          prev.includes(exchange.id as Exchange)
-                            ? prev.filter((item) => item !== exchange.id)
-                            : [...prev, exchange.id as Exchange]
-                        )
-                      }
-                      className={clsx(
-                        "rounded-full border px-3 py-1 text-xs font-semibold transition",
-                        active
-                          ? "border-indigo-300 bg-indigo-50 text-indigo-700 shadow-sm"
-                          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                      )}
-                    >
-                      {exchange.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs font-semibold text-slate-600">{COPY.filters.typeLabel}</div>
-              <div className="flex flex-wrap gap-2">
-                {COPY.filters.types.map((type) => {
-                  const active = selectedTypes.includes(type.id as MarketTypeId);
-                  return (
-                    <button
-                      key={type.id}
-                      type="button"
-                      onClick={() =>
-                        setSelectedTypes((prev) =>
-                          prev.includes(type.id as MarketTypeId)
-                            ? prev.filter((item) => item !== type.id)
-                            : [...prev, type.id as MarketTypeId]
-                        )
-                      }
-                      className={clsx(
-                        "rounded-full border px-3 py-1 text-xs font-semibold transition",
-                        active
-                          ? "border-slate-300 bg-slate-100 text-slate-700 shadow-sm"
-                          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                      )}
-                    >
-                      {type.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs font-semibold text-slate-600">{COPY.filters.timeLabel}</div>
-              <div className="flex flex-wrap gap-2">
-                {COPY.filters.times.map((range) => (
-                  <button
-                    key={range.id}
-                    type="button"
-                    onClick={() => setTimeRange(range.id)}
-                    className={clsx(
-                      "rounded-full border px-3 py-1 text-xs font-semibold transition",
-                      timeRange === range.id
-                        ? "border-indigo-300 bg-indigo-50 text-indigo-700 shadow-sm"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                    )}
-                  >
-                    {range.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="space-y-4">
-          {grouped.map((group) => {
-            const meta = EXCHANGE_META[group.exchange];
+          {cards.map((card) => {
+            const meta = EXCHANGE_META[card.exchange];
             return (
-              <div key={group.exchange} className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div key={card.exchange} className="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
                   <div className="flex items-center gap-3">
                     <span
@@ -325,69 +353,135 @@ export default function ExchangeUpdatesPage() {
                     >
                       {meta.short}
                     </span>
-                    <div>
-                      <div className="text-lg font-semibold text-slate-900">
-                        {meta.label} {COPY.cards.suffix}
-                      </div>
-                      <div className="text-xs text-slate-500">{COPY.cards.listLabel}</div>
-                    </div>
+                    <div className="text-lg font-semibold text-slate-900">{meta.label}</div>
                   </div>
-                  <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
-                    默认排序
-                  </span>
-                </div>
-                <div className="divide-y divide-slate-200">
-                  {group.items.length === 0 ? (
-                    <div className="px-5 py-4 text-sm text-slate-500">{COPY.list.empty}</div>
-                  ) : (
-                    group.items.map((item) => (
-                      <div
-                        key={`${item.exchange}-${item.pair_name}`}
-                        className="flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700">
-                            {item.token_symbol.slice(0, 1)}
-                          </span>
-                          <div>
-                            <div className="text-sm font-semibold text-slate-900">
-                              {truncatePair(item.pair_name)}
-                            </div>
-                            <div className="text-xs text-slate-500">
-                              {item.token_symbol} · {item.market_type}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-                          <span className={clsx("rounded-full border px-2 py-1 font-semibold", marketBadgeClass(item.market_type))}>
-                            {item.market_type}
-                          </span>
-                          <span>
-                            {COPY.list.headers.leverage}: {item.leverage}
-                          </span>
-                          <span>
-                            {COPY.list.headers.listedAt}: {item.listed_at}
-                          </span>
-                        </div>
-                        <Link
-                          href={`/scan?token_address=${encodeURIComponent(item.token_address)}`}
-                          className="inline-flex items-center justify-center gap-2 rounded-full border border-indigo-300 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700 shadow-sm transition hover:bg-indigo-100"
-                        >
-                          {COPY.list.actionLabel}
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
-                            <path
-                              d="M5 12h12m0 0l-4-4m4 4l-4 4"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </Link>
-                      </div>
-                    ))
+                  {card.exchange === "Binance" && (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
+                          <path d="M6 9l6 6l6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                      {COPY.cards.sortLabel}
+                    </span>
                   )}
                 </div>
+
+                {card.layout === "rows" ? (
+                  card.sections.map((section) => {
+                    const rows = chunkItems(section.items, 2);
+                    return (
+                      <div key={section.title} className="px-5 py-4">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                          <span className="h-1.5 w-1.5 rounded-full bg-slate-500" />
+                          {section.title}
+                        </div>
+                        <div className="mt-3 space-y-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                          {rows.map((row, rowIdx) => (
+                            <div
+                              key={`${section.title}-${rowIdx}`}
+                              className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white/90 px-4 py-3 md:flex-row md:items-center md:justify-between"
+                            >
+                              <div className="grid w-full gap-4 md:grid-cols-2">
+                                {row.map((item, idx) => (
+                                  <div
+                                    key={`${item.pair_name}-${idx}`}
+                                    className={clsx(
+                                      "flex items-center gap-3",
+                                      idx === 0 && row.length > 1 ? "md:border-r md:border-slate-200 md:pr-4" : "md:pl-0"
+                                    )}
+                                  >
+                                    <span
+                                      className={clsx(
+                                        "flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br text-sm font-semibold text-white shadow-sm",
+                                        getTokenColor(item.token_symbol)
+                                      )}
+                                    >
+                                      {item.token_symbol.slice(0, 1)}
+                                    </span>
+                                    <div>
+                                      <div className="text-sm font-semibold text-slate-900">{item.pair_name}</div>
+                                      <div className="text-xs text-slate-500">{buildMetaLine(item)}</div>
+                                    </div>
+                                  </div>
+                                ))}
+                                {row.length === 1 && <div className="hidden md:block" />}
+                              </div>
+                              <Link
+                                href={`/scan?token_address=${encodeURIComponent(row[0].token_address)}`}
+                                className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#5b7dfb] to-[#3e67e5] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
+                              >
+                                {COPY.list.actionLabel}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
+                                  <path
+                                    d="M5 12h12m0 0l-4-4m4 4l-4 4"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </Link>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="grid gap-4 px-5 py-4 md:grid-cols-2">
+                    {card.sections.map((section, sectionIdx) => (
+                      <div
+                        key={`${card.exchange}-${sectionIdx}`}
+                        className="rounded-xl border border-slate-200 bg-slate-50/60"
+                      >
+                        <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                          {section.title}
+                        </div>
+                        <div className="divide-y divide-slate-200">
+                          {section.items.length === 0 ? (
+                            <div className="px-4 py-4 text-sm text-slate-500">{COPY.list.empty}</div>
+                          ) : (
+                            section.items.map((item) => (
+                              <div key={item.pair_name} className="flex items-center justify-between gap-3 px-4 py-3">
+                                <div className="flex items-center gap-3">
+                                  <span
+                                    className={clsx(
+                                      "flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br text-sm font-semibold text-white shadow-sm",
+                                      getTokenColor(item.token_symbol)
+                                    )}
+                                  >
+                                    {item.token_symbol.slice(0, 1)}
+                                  </span>
+                                  <div>
+                                    <div className="text-sm font-semibold text-slate-900">{item.pair_name}</div>
+                                    <div className="text-xs text-slate-500">{buildMetaLine(item)}</div>
+                                  </div>
+                                </div>
+                                <Link
+                                  href={`/scan?token_address=${encodeURIComponent(item.token_address)}`}
+                                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#5b7dfb] to-[#3e67e5] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
+                                >
+                                  {COPY.list.actionLabel}
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
+                                    <path
+                                      d="M5 12h12m0 0l-4-4m4 4l-4 4"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </Link>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}

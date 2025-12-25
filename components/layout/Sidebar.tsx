@@ -27,6 +27,26 @@ const navItems: { href: string; label: string; icon: React.ReactNode; requiresAu
     ),
   },
   {
+    href: "/abnormal-tokens",
+    label: "今日异常代币",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-5 h-5"
+      >
+        <path d="M12 3l9 16H3l9-16z" />
+        <path d="M12 9v4" />
+        <path d="M12 17h.01" />
+      </svg>
+    ),
+  },
+  {
     href: "/new-listings",
     label: "今日新入市",
     icon: (

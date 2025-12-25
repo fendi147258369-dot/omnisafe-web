@@ -11,10 +11,11 @@ const COPY = {
   title: "今日异常代币",
   subtitle: "基于链上可验证事实整理，仅展示异常行为信号，不构成结论",
   filters: {
-    title: "异常筛选",
+    title: "筛选",
     chainLabel: "链筛选",
     timeLabel: "时间范围",
     typeLabel: "异常类型",
+    sortLabel: "默认排序",
     chains: [
       { id: "Ethereum", label: "Ethereum" },
       { id: "BSC", label: "BSC" },
@@ -31,6 +32,10 @@ const COPY = {
       { id: "trading", label: "交易行为异常" },
       { id: "deployer", label: "部署者异常" },
     ],
+    sortOptions: [
+      { id: "default", label: "默认排序" },
+      { id: "recent", label: "按时间" },
+    ],
   },
   list: {
     title: "异常代币列表",
@@ -39,10 +44,11 @@ const COPY = {
       token: "代币",
       tokenAddress: "代币地址",
       pairAddress: "交易池地址",
-      createdAt: "创建时间",
-      tags: "异常标签",
+      tags: "异常类型",
+      detail: "异常内容",
+      createdAt: "发现时间",
       level: "异常等级",
-      action: "操作",
+      action: "查看检测",
     },
     actionLabel: "查看检测",
     empty: "暂无异常代币记录",
@@ -57,6 +63,7 @@ const COPY = {
 
 type TimeRangeId = (typeof COPY.filters.timeRanges)[number]["id"];
 type AbnormalTypeId = (typeof COPY.filters.types)[number]["id"];
+type SortById = (typeof COPY.filters.sortOptions)[number]["id"];
 type RiskLevel = (typeof COPY.riskLevels)[keyof typeof COPY.riskLevels];
 
 type AbnormalToken = {
@@ -67,6 +74,7 @@ type AbnormalToken = {
   pair_address: string;
   created_at: string;
   abnormal_tags: string[];
+  abnormal_detail: string;
   risk_level: RiskLevel;
 };
 
@@ -81,6 +89,7 @@ const MOCK_TOKENS: AbnormalToken[] = [
     pair_address: "0x9a1b2c3d4e5f678901234567890abcdef1234567",
     created_at: "12 分钟前",
     abnormal_tags: ["权限未放弃", "交易高度集中"],
+    abnormal_detail: "调用 setTaxFee，税率从 2% 调整至 15%",
     risk_level: COPY.riskLevels.medium,
   },
   {
@@ -91,6 +100,7 @@ const MOCK_TOKENS: AbnormalToken[] = [
     pair_address: "0x3f9d4e5c6b7a8091827364556677889900aabbcc",
     created_at: "18 分钟前",
     abnormal_tags: ["低流动性高交易", "LP 快速移除"],
+    abnormal_detail: "流动性池中移除约 $48,000",
     risk_level: COPY.riskLevels.high,
   },
   {
@@ -101,6 +111,7 @@ const MOCK_TOKENS: AbnormalToken[] = [
     pair_address: "0x8b7d6a5c4e3f2109876543210fedcba987654321",
     created_at: "32 分钟前",
     abnormal_tags: ["权限未放弃"],
+    abnormal_detail: "单笔转出约 17% 代币，估值 $21,000",
     risk_level: COPY.riskLevels.low,
   },
   {
@@ -111,6 +122,7 @@ const MOCK_TOKENS: AbnormalToken[] = [
     pair_address: "0x1f2e3d4c5b6a79880796a5b4c3d2e1f0a9b8c7d6",
     created_at: "45 分钟前",
     abnormal_tags: ["部署者异常", "交易行为异常"],
+    abnormal_detail: "Ownership 已变更至新地址",
     risk_level: COPY.riskLevels.medium,
   },
   {
@@ -121,6 +133,7 @@ const MOCK_TOKENS: AbnormalToken[] = [
     pair_address: "0xabc1234567890defabc1234567890defabc12345",
     created_at: "56 分钟前",
     abnormal_tags: ["交易高度集中"],
+    abnormal_detail: "多地址集中调用 setOwner",
     risk_level: COPY.riskLevels.low,
   },
 ];
@@ -187,12 +200,32 @@ export default function AbnormalTokensPage() {
   const [selectedTypes, setSelectedTypes] = useState<AbnormalTypeId[]>(
     COPY.filters.types.map((item) => item.id)
   );
+  const [sortBy, setSortBy] = useState<SortById>(COPY.filters.sortOptions[0].id);
 
   useEffect(() => {
     getAbnormalTokens().then(setTokens);
   }, []);
 
   const displayTokens = tokens;
+  const chainCounts: Record<AbnormalToken["chain"], number> = {
+    Ethereum: 0,
+    BSC: 0,
+    Base: 0,
+    Arbitrum: 0,
+  };
+  displayTokens.forEach((item) => {
+    chainCounts[item.chain] += 1;
+  });
+  const currentSortLabel =
+    COPY.filters.sortOptions.find((option) => option.id === sortBy)?.label ??
+    COPY.filters.sortOptions[0].label;
+  const toggleSort = () => {
+    setSortBy((prev) =>
+      prev === COPY.filters.sortOptions[0].id
+        ? COPY.filters.sortOptions[1].id
+        : COPY.filters.sortOptions[0].id
+    );
+  };
 
   return (
     <AppShell>
@@ -215,11 +248,11 @@ export default function AbnormalTokensPage() {
           </div>
         </div>
 
-        <Section title={COPY.filters.title} description="">
-          <div className="grid gap-4 lg:grid-cols-3">
-            <div className="space-y-2">
-              <div className="text-xs font-semibold text-slate-600">{COPY.filters.chainLabel}</div>
-              <div className="flex flex-wrap gap-2">
+        <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm font-semibold text-slate-700">{COPY.filters.title}</span>
+              <div className="flex flex-wrap items-center gap-2">
                 {COPY.filters.chains.map((chain) => {
                   const active = selectedChains.includes(chain.id as AbnormalToken["chain"]);
                   const style = CHAIN_STYLES[chain.id as AbnormalToken["chain"]];
@@ -235,45 +268,58 @@ export default function AbnormalTokensPage() {
                         )
                       }
                       className={clsx(
-                        "rounded-full border px-3 py-1 text-xs font-semibold transition",
+                        "flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold transition",
                         active
                           ? "border-indigo-300 bg-indigo-50 text-indigo-700 shadow-sm"
                           : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                       )}
                     >
-                      <span className="inline-flex items-center gap-2">
-                        <span className={clsx("flex h-5 w-5 items-center justify-center rounded-full", style.icon)}>
-                          <img src={CHAIN_ICONS[chain.id as AbnormalToken["chain"]]} alt={chain.label} className="h-3 w-3" />
-                        </span>
-                        {chain.label}
+                      <span className={clsx("flex h-5 w-5 items-center justify-center rounded-full", style.icon)}>
+                        <img src={CHAIN_ICONS[chain.id as AbnormalToken["chain"]]} alt={chain.label} className="h-3 w-3" />
                       </span>
+                      <span>{chain.label}</span>
+                      <span className="text-slate-500">{chainCounts[chain.id as AbnormalToken["chain"]]}</span>
                     </button>
                   );
                 })}
               </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs font-semibold text-slate-600">{COPY.filters.timeLabel}</div>
-              <div className="flex flex-wrap gap-2">
-                {COPY.filters.timeRanges.map((range) => (
+              <div className="flex items-center gap-2 lg:ml-auto">
+                <button
+                  type="button"
+                  onClick={toggleSort}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm hover:bg-slate-50"
+                >
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
+                      <path d="M6 9l6 6l6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  {currentSortLabel}
+                </button>
+                <div className="flex items-center gap-1">
                   <button
-                    key={range.id}
                     type="button"
-                    onClick={() => setTimeRange(range.id)}
-                    className={clsx(
-                      "rounded-full border px-4 py-1 text-xs font-semibold transition",
-                      timeRange === range.id
-                        ? "border-indigo-300 bg-indigo-50 text-indigo-700 shadow-sm"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                    )}
+                    aria-label="上一页"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm hover:bg-slate-50"
                   >
-                    {range.label}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
+                      <path d="M15 6l-6 6l6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </button>
-                ))}
+                  <button
+                    type="button"
+                    aria-label="下一页"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm hover:bg-slate-50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
+                      <path d="M9 6l6 6l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="text-xs font-semibold text-slate-600">{COPY.filters.typeLabel}</div>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-xs font-semibold text-slate-500">{COPY.filters.typeLabel}</span>
               <div className="flex flex-wrap gap-2">
                 {COPY.filters.types.map((item) => {
                   const active = selectedTypes.includes(item.id);
@@ -291,7 +337,7 @@ export default function AbnormalTokensPage() {
                       className={clsx(
                         "rounded-full border px-3 py-1 text-xs font-semibold transition",
                         active
-                          ? "border-slate-400 bg-slate-100 text-slate-700 shadow-sm"
+                          ? "border-slate-300 bg-slate-100 text-slate-700 shadow-sm"
                           : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                       )}
                     >
@@ -300,19 +346,37 @@ export default function AbnormalTokensPage() {
                   );
                 })}
               </div>
+              <span className="hidden sm:inline-block h-4 w-px bg-slate-200" />
+              <span className="text-xs font-semibold text-slate-500">{COPY.filters.timeLabel}</span>
+              <div className="flex flex-wrap gap-2">
+                {COPY.filters.timeRanges.map((range) => (
+                  <button
+                    key={range.id}
+                    type="button"
+                    onClick={() => setTimeRange(range.id)}
+                    className={clsx(
+                      "rounded-full border px-3 py-1 text-xs font-semibold transition",
+                      timeRange === range.id
+                        ? "border-indigo-300 bg-indigo-50 text-indigo-700 shadow-sm"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    )}
+                  >
+                    {range.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </Section>
+        </div>
 
         <Section title={COPY.list.title} description="">
           <div className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm">
-            <div className="hidden md:grid grid-cols-[120px_180px_1fr_1fr_120px_220px_110px_130px] gap-3 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 px-5 py-3 text-xs font-semibold text-slate-500">
+            <div className="hidden md:grid grid-cols-[110px_260px_200px_1fr_130px_120px_130px] gap-3 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 px-5 py-3 text-xs font-semibold text-slate-500">
               <div>{COPY.list.headers.chain}</div>
               <div>{COPY.list.headers.token}</div>
-              <div>{COPY.list.headers.tokenAddress}</div>
-              <div>{COPY.list.headers.pairAddress}</div>
-              <div>{COPY.list.headers.createdAt}</div>
               <div>{COPY.list.headers.tags}</div>
+              <div>{COPY.list.headers.detail}</div>
+              <div>{COPY.list.headers.createdAt}</div>
               <div>{COPY.list.headers.level}</div>
               <div>{COPY.list.headers.action}</div>
             </div>
@@ -324,6 +388,7 @@ export default function AbnormalTokensPage() {
               ) : (
                 displayTokens.map((item, index) => {
                   const style = CHAIN_STYLES[item.chain];
+                  const tokenInitial = item.token_symbol.slice(0, 1);
                   return (
                     <div
                       key={`${item.chain}-${item.token_address}`}
@@ -331,30 +396,47 @@ export default function AbnormalTokensPage() {
                       style={{ animationDelay: `${index * 80}ms` }}
                     >
                       <span className={clsx("absolute left-0 top-0 h-full w-1.5", style.bar)} />
-                      <div className="hidden md:grid grid-cols-[120px_180px_1fr_1fr_120px_220px_110px_130px] items-center gap-3 pl-4 text-sm text-slate-700">
+                      <div className="hidden md:grid grid-cols-[110px_260px_200px_1fr_130px_120px_130px] items-center gap-3 pl-4 text-sm text-slate-700">
                         <div className="flex items-center gap-2">
-                          <span className={clsx("flex h-8 w-8 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
+                          <span className={clsx("flex h-9 w-9 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
                             <img src={CHAIN_ICONS[item.chain]} alt={item.chain} className="h-4 w-4" />
                           </span>
                           <span className={clsx("font-semibold", style.text)}>{item.chain}</span>
                         </div>
-                        <div>
-                          <div className="text-sm font-semibold text-slate-900">{item.token_name}</div>
-                          <div className="text-xs text-slate-500">{item.token_symbol}</div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-3">
+                            <span className={clsx("flex h-10 w-10 items-center justify-center rounded-full bg-white ring-1 ring-slate-200 text-sm font-semibold", style.icon)}>
+                              {tokenInitial}
+                            </span>
+                            <div>
+                              <div className="text-sm font-semibold text-slate-900">{item.token_name}</div>
+                              <div className="text-xs text-slate-500">{item.token_symbol}</div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {COPY.list.headers.tokenAddress}:{" "}
+                            <span className="font-mono text-slate-600">{truncateAddress(item.token_address)}</span>
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {COPY.list.headers.pairAddress}:{" "}
+                            <span className="font-mono text-slate-600">{truncateAddress(item.pair_address)}</span>
+                          </div>
                         </div>
-                        <div className="font-mono text-xs text-slate-600">{truncateAddress(item.token_address)}</div>
-                        <div className="font-mono text-xs text-slate-600">{truncateAddress(item.pair_address)}</div>
+                        <TagPills
+                          tags={item.abnormal_tags}
+                          pillClassName="border-slate-200 bg-[#f4f0e8] text-slate-700"
+                        />
+                        <div className="text-xs leading-5 text-slate-600">{item.abnormal_detail}</div>
                         <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                           <span className="h-1.5 w-1.5 rounded-full bg-sky-400 pulse-dot" />
                           {item.created_at}
                         </div>
-                        <TagPills tags={item.abnormal_tags} />
                         <span className={clsx("inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold", riskLevelClass(item.risk_level))}>
                           {item.risk_level}
                         </span>
                         <Link
                           href={`/scan?token_address=${encodeURIComponent(item.token_address)}`}
-                          className="inline-flex items-center justify-center gap-2 rounded-full border border-indigo-300 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"
+                          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#5b7dfb] to-[#3e67e5] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
                         >
                           {COPY.list.actionLabel}
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
@@ -376,7 +458,9 @@ export default function AbnormalTokensPage() {
                             </span>
                             <div>
                               <div className="text-sm font-semibold text-slate-900">{item.token_name}</div>
-                              <div className={clsx("text-xs", style.text)}>{item.token_symbol}</div>
+                              <div className={clsx("text-xs", style.text)}>
+                                {item.token_symbol} · {item.chain}
+                              </div>
                             </div>
                           </div>
                           <span className={clsx("inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold", riskLevelClass(item.risk_level))}>
@@ -400,13 +484,17 @@ export default function AbnormalTokensPage() {
                             <span className="font-mono text-slate-600">{truncateAddress(item.pair_address)}</span>
                           </div>
                         </div>
+                        <div className="text-xs text-slate-600">{item.abnormal_detail}</div>
                         <div className="space-y-2">
                           <div className="text-xs font-semibold text-slate-500">{COPY.list.headers.tags}</div>
-                          <TagPills tags={item.abnormal_tags} />
+                          <TagPills
+                            tags={item.abnormal_tags}
+                            pillClassName="border-slate-200 bg-[#f4f0e8] text-slate-700"
+                          />
                         </div>
                         <Link
                           href={`/scan?token_address=${encodeURIComponent(item.token_address)}`}
-                          className="inline-flex items-center justify-center gap-2 rounded-full border border-indigo-300 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"
+                          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#5b7dfb] to-[#3e67e5] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
                         >
                           {COPY.list.actionLabel}
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-3 w-3" fill="none">
@@ -438,9 +526,7 @@ export default function AbnormalTokensPage() {
           background: radial-gradient(420px circle at 10% 0%, rgba(99, 102, 241, 0.16), transparent 60%),
             radial-gradient(420px circle at 90% 0%, rgba(56, 189, 248, 0.14), transparent 55%),
             linear-gradient(120deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.7));
-          background-size: 200% 200%;
-          animation: headerGlow 12s ease-in-out infinite;
-          opacity: 0.7;
+          opacity: 0.75;
         }
 
         .pulse-dot {
@@ -450,18 +536,6 @@ export default function AbnormalTokensPage() {
         .abnormal-row {
           animation: fadeUp 0.5s ease both;
           will-change: transform, opacity;
-        }
-
-        @keyframes headerGlow {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
         }
 
         @keyframes pulse {

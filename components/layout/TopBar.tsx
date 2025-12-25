@@ -11,6 +11,7 @@ type Provider = "google" | "telegram" | null;
 
 const navItems: { href: string; label: string; requiresAuth?: boolean }[] = [
   { href: "/scan", label: "代币检测" },
+  { href: "/new-listings", label: "今日新入市" },
   { href: "/pricing", label: "方案定价" },
   { href: "/credits", label: "账单 / 充值", requiresAuth: true },
   { href: "/bots", label: "机器人集成" },

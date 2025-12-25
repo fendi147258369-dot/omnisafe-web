@@ -27,6 +27,26 @@ const navItems: { href: string; label: string; icon: React.ReactNode; requiresAu
     ),
   },
   {
+    href: "/new-listings",
+    label: "今日新入市",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-5 h-5"
+      >
+        <path d="M3 6h18" />
+        <path d="M3 12h18" />
+        <path d="M3 18h12" />
+      </svg>
+    ),
+  },
+  {
     href: "/pricing",
     label: "方案定价",
     icon: (

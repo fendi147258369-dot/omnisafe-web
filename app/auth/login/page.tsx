@@ -280,7 +280,7 @@ export default function LoginPage() {
               </div>
               <p className="text-center text-slate-800">无需注册 · 不保存密码 · 即点即用</p>
               <p className="text-center text-slate-800">选择以下方式登录</p>
-              <div className="flex items-center justify-center gap-6">
+              <div className="flex flex-col items-center justify-center gap-4 md:flex-row md:gap-6">
                 <div className="flex flex-col items-center gap-2">
                   <div
                     ref={googleBtnRef}

@@ -5,14 +5,26 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { AppShell } from "../../../components/layout/AppShell";
 
+type TelegramAuthPayload = {
+  id: number;
+  first_name?: string;
+  username?: string;
+  photo_url?: string;
+  auth_date: number;
+  hash: string;
+};
+
 declare global {
   interface Window {
     google?: any;
+    onTelegramAuth?: (user: TelegramAuthPayload) => void;
   }
 }
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.omnisafe.info";
+const TELEGRAM_BOT_USERNAME =
+  process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME;
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="h-6 w-6">
@@ -53,6 +65,7 @@ export default function LoginPage() {
   const [googleReady, setGoogleReady] = useState(false);
   const initializedRef = useRef(false);
   const googleBtnRef = useRef<HTMLDivElement | null>(null);
+  const telegramBtnRef = useRef<HTMLDivElement | null>(null);
   const clientMissing = !GOOGLE_CLIENT_ID;
 
   const renderGoogleButton = useCallback(() => {
@@ -148,6 +161,72 @@ export default function LoginPage() {
     return () => window.clearInterval(interval);
   }, [router, googleReady, clientMissing, renderGoogleButton]);
 
+  useEffect(() => {
+    if (!TELEGRAM_BOT_USERNAME || typeof window === "undefined") return;
+    if (!telegramBtnRef.current) return;
+
+    const handleTelegramAuth = async (user: TelegramAuthPayload) => {
+      if (!user?.hash) {
+        setError("Telegram 授权失败，请重试");
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_BASE}/auth/telegram`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        });
+        if (!res.ok) {
+          let detail = "";
+          try {
+            const data = await res.json();
+            detail = data?.detail || JSON.stringify(data);
+          } catch {
+            detail = await res.text();
+          }
+          throw new Error(detail || "登录失败");
+        }
+        const data = await res.json();
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("auth_provider", "telegram");
+        const displayName = user.username ? `@${user.username}` : user.first_name || `TG:${user.id}`;
+        localStorage.setItem("user_email", displayName);
+        window.dispatchEvent(new Event("auth-changed"));
+        window.dispatchEvent(new CustomEvent("auth-toast", { detail: { message: "登录成功" } }));
+        setToast("登录成功");
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
+      } catch (e: any) {
+        setError(e?.message || "登录失败");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    window.onTelegramAuth = handleTelegramAuth;
+    const container = telegramBtnRef.current;
+    container.innerHTML = "";
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.async = true;
+    script.setAttribute("data-telegram-login", TELEGRAM_BOT_USERNAME);
+    script.setAttribute("data-size", "large");
+    script.setAttribute("data-userpic", "false");
+    script.setAttribute("data-radius", "999");
+    script.setAttribute("data-request-access", "write");
+    script.setAttribute("data-onauth", "onTelegramAuth(user)");
+    container.appendChild(script);
+
+    return () => {
+      if (window.onTelegramAuth === handleTelegramAuth) {
+        delete window.onTelegramAuth;
+      }
+    };
+  }, [router, TELEGRAM_BOT_USERNAME]);
+
   const handleGoogleLogin = () => {
     if (!GOOGLE_CLIENT_ID) {
       setError("缺少 NEXT_PUBLIC_GOOGLE_CLIENT_ID，请配置后刷新。");
@@ -218,14 +297,19 @@ export default function LoginPage() {
                   </button>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <button
-                    type="button"
-                    disabled
-                    aria-label="Telegram 即将支持"
-                    className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2ca5e0] shadow text-white"
-                  >
-                    <TelegramIcon />
-                  </button>
+                  {TELEGRAM_BOT_USERNAME ? (
+                    <div ref={telegramBtnRef} className="flex h-12 items-center justify-center min-w-[48px]" />
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      aria-label="Telegram 未配置"
+                      title="缺少 NEXT_PUBLIC_TELEGRAM_BOT_USERNAME"
+                      className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2ca5e0] shadow text-white"
+                    >
+                      <TelegramIcon />
+                    </button>
+                  )}
                   <span className="text-xs text-slate-500">Telegram</span>
                 </div>
               </div>

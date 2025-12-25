@@ -56,7 +56,7 @@ const CardHeader = ({
   </div>
 );
 
-const BulletList = ({ items }: { items: string[] }) => (
+const BulletList = ({ items }: { items: ReadonlyArray<string> }) => (
   <ul className="mt-4 grid gap-2 text-sm text-slate-700">
     {items.map((item) => (
       <li key={item} className="flex items-start gap-2">

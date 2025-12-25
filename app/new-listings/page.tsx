@@ -52,6 +52,8 @@ const COPY = {
 } as const;
 
 type RiskHint = (typeof COPY.riskHints)[keyof typeof COPY.riskHints];
+type TimeRangeId = (typeof COPY.filters.timeRanges)[number]["id"];
+type SortById = (typeof COPY.filters.sortOptions)[number]["id"];
 
 type Listing = {
   chain: "Ethereum" | "BSC" | "Base" | "Arbitrum";
@@ -136,8 +138,8 @@ export default function NewListingsPage() {
   const [selectedChains, setSelectedChains] = useState<Listing["chain"][]>(
     COPY.filters.chains.map((item) => item.id as Listing["chain"])
   );
-  const [timeRange, setTimeRange] = useState(COPY.filters.timeRanges[0].id);
-  const [sortBy, setSortBy] = useState(COPY.filters.sortOptions[0].id);
+  const [timeRange, setTimeRange] = useState<TimeRangeId>(COPY.filters.timeRanges[0].id);
+  const [sortBy, setSortBy] = useState<SortById>(COPY.filters.sortOptions[0].id);
 
   useEffect(() => {
     getNewListings().then(setListings);

@@ -67,6 +67,29 @@ const navItems: { href: string; label: string; icon: React.ReactNode; requiresAu
     ),
   },
   {
+    href: "/exchange-updates",
+    label: "今日交易所动态",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-5 h-5"
+      >
+        <path d="M7 7h10" />
+        <path d="M7 7l-2 2" />
+        <path d="M7 7l-2-2" />
+        <path d="M17 17H7" />
+        <path d="M17 17l2 2" />
+        <path d="M17 17l2-2" />
+      </svg>
+    ),
+  },
+  {
     href: "/pricing",
     label: "方案定价",
     icon: (

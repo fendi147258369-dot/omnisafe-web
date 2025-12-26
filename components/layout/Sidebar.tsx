@@ -28,7 +28,7 @@ const navItems: { href: string; label: string; icon: React.ReactNode; requiresAu
   },
   {
     href: "/abnormal-tokens",
-    label: "今日异常代币",
+    label: "Solana 新币雷达",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"

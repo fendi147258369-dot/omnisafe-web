@@ -12,7 +12,7 @@ type Provider = "google" | "telegram" | null;
 const navItems: { href: string; label: string; requiresAuth?: boolean }[] = [
   { href: "/scan", label: "代币检测" },
   { href: "/abnormal-tokens", label: "Solana 新币雷达" },
-  { href: "/new-listings", label: "今日新入市" },
+  { href: "/new-listings", label: "ETH · BSC 链上雷达" },
   { href: "/exchange-updates", label: "今日交易所动态" },
   { href: "/pricing", label: "方案定价" },
   { href: "/credits", label: "账单 / 充值", requiresAuth: true },

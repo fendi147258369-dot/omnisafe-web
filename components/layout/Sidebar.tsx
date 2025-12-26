@@ -48,7 +48,7 @@ const navItems: { href: string; label: string; icon: React.ReactNode; requiresAu
   },
   {
     href: "/new-listings",
-    label: "今日新入市",
+    label: "ETH · BSC 链上雷达",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"

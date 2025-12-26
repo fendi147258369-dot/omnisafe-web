@@ -278,11 +278,11 @@ export default function AbnormalTokensPage() {
             {tokens.map((item, index) => (
               <div
                 key={`${item.symbol}-${item.address}`}
-                className="token-card relative overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-sm"
+                className="token-card relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-sm"
                 style={{ animationDelay: `${index * 80}ms` }}
               >
                 <div className="absolute inset-0 card-wave" aria-hidden="true" />
-                <div className="relative">
+                <div className="relative flex-1">
                   <div className="flex items-center gap-4">
                     <span
                       className={clsx(
@@ -351,7 +351,7 @@ export default function AbnormalTokensPage() {
                   <div className="mt-5 flex flex-wrap items-center gap-3">
                     <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                       <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                      初始流:{item.flow_tag}
+                      已轻度检测
                     </span>
                     <Link
                       href={`/scan?token_address=${encodeURIComponent(item.address)}`}
@@ -369,13 +369,11 @@ export default function AbnormalTokensPage() {
                       </svg>
                     </Link>
                   </div>
+                </div>
 
-                  <div className="mt-5 flex items-center gap-2 border-t border-slate-200/70 pt-3 text-xs text-slate-500">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
-                      !
-                    </span>
-                    {COPY.footerNote}
-                  </div>
+                <div className="relative mt-5 flex items-center gap-2 border-t border-slate-200/70 pt-3 text-xs text-slate-500">
+                  <span className="hint-icon">!</span>
+                  {COPY.footerNote}
                 </div>
               </div>
             ))}
@@ -427,6 +425,19 @@ export default function AbnormalTokensPage() {
           border-radius: 9999px;
           background: rgba(99, 102, 241, 0.12);
           color: rgb(99, 102, 241);
+        }
+
+        .hint-icon {
+          display: inline-flex;
+          height: 20px;
+          width: 20px;
+          align-items: center;
+          justify-content: center;
+          border-radius: 9999px;
+          background: rgba(99, 102, 241, 0.12);
+          color: rgb(99, 102, 241);
+          font-weight: 700;
+          font-size: 12px;
         }
 
         .pulse-dot {

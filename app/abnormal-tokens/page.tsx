@@ -40,7 +40,8 @@ const COPY = {
     statusLabel: "可交易",
     actionLabel: "查看检测（付费）",
   },
-  footerNote: "提示：本页面仅展示 Solana 链上发现新交易池与初始流动性，不构成任何投资建议。",
+  footerNote:
+    "本页面所展示的为监控时的初步筛选检测，无法构成有效的查验事实。在进行交易前，请务必进行深度检测，确保你了解该币种的详细合约信息与可视化风险。",
 } as const;
 
 type TimeFilterId = (typeof COPY.list.timeFilters)[number]["id"];

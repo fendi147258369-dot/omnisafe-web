@@ -44,6 +44,7 @@ const COPY = {
 } as const;
 
 type TimeFilterId = (typeof COPY.list.timeFilters)[number]["id"];
+type FlowFilterId = (typeof COPY.list.flowOptions)[number]["id"];
 
 type SolanaToken = {
   symbol: string;
@@ -131,7 +132,7 @@ const truncateAddress = (value: string) => {
 export default function AbnormalTokensPage() {
   const [tokens, setTokens] = useState<SolanaToken[]>([]);
   const [activeTime, setActiveTime] = useState<TimeFilterId>(COPY.list.timeFilters[2].id);
-  const [activeFlow, setActiveFlow] = useState(COPY.list.flowOptions[0].id);
+  const [activeFlow, setActiveFlow] = useState<FlowFilterId>(COPY.list.flowOptions[0].id);
 
   useEffect(() => {
     getSolanaNewTokens().then(setTokens);

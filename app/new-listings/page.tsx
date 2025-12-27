@@ -519,7 +519,7 @@ export default function NewListingsPage() {
             <div className="px-3">
               <div
                 className={clsx(
-                  "hidden md:grid justify-items-center gap-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-6 py-3 text-center text-xs font-semibold text-slate-500",
+                  "hidden md:grid justify-items-center gap-4 border-x border-b border-transparent bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-6 py-3 text-center text-xs font-semibold text-slate-500",
                   TABLE_COLS
                 )}
               >

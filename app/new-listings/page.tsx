@@ -29,7 +29,6 @@ const COPY = {
       tokenAddress: "代币地址",
       pairAddress: "交易池地址",
       poolAge: "池龄",
-      createdAt: "创建时间",
       liquidity: "状态",
       action: "操作",
     },
@@ -183,7 +182,7 @@ const CHAIN_TABS: { id: ChainTabId; label: string }[] = [
   { id: "Arbitrum", label: "Ars" },
 ];
 
-const TABLE_COLS = "grid-cols-[120px_160px_minmax(140px,1fr)_minmax(140px,1fr)_110px_110px_110px_120px]";
+const TABLE_COLS = "grid-cols-[120px_160px_minmax(150px,1fr)_minmax(150px,1fr)_120px_120px_120px]";
 
 const HEAT_RANGES: { id: HeatRangeId; label: string }[] = [
   { id: "7d", label: "7d" },
@@ -526,7 +525,6 @@ export default function NewListingsPage() {
               <div>{COPY.list.headers.tokenAddress}</div>
               <div>{COPY.list.headers.pairAddress}</div>
               <div>{COPY.list.headers.poolAge}</div>
-              <div>{COPY.list.headers.createdAt}</div>
               <div>{COPY.list.headers.liquidity}</div>
               <div>{COPY.list.headers.action}</div>
             </div>
@@ -582,7 +580,6 @@ export default function NewListingsPage() {
                             {item.pool_age}
                           </span>
                         </div>
-                        <div className="text-xs font-semibold text-slate-700">{item.created_at}</div>
                         <div>
                           <span
                             className={clsx(
@@ -630,10 +627,6 @@ export default function NewListingsPage() {
                               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 pulse-dot" />
                               {item.pool_age}
                             </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span>{COPY.list.headers.createdAt}</span>
-                            <span className="font-semibold text-slate-700">{item.created_at}</span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>{COPY.list.headers.liquidity}</span>

@@ -183,6 +183,8 @@ const CHAIN_TABS: { id: ChainTabId; label: string }[] = [
 ];
 
 const TABLE_COLS = "grid-cols-[120px_160px_minmax(150px,1fr)_minmax(150px,1fr)_120px_120px_120px]";
+const TABLE_HEAD_CELL = "flex w-full min-w-0 items-center justify-center";
+const TABLE_BODY_CELL = "flex w-full min-w-0 items-center justify-center";
 
 const HEAT_RANGES: { id: HeatRangeId; label: string }[] = [
   { id: "7d", label: "7d" },
@@ -521,13 +523,13 @@ export default function NewListingsPage() {
                   TABLE_COLS
                 )}
               >
-                <div className="min-w-0">{COPY.list.headers.chain}</div>
-                <div className="min-w-0">{COPY.list.headers.token}</div>
-                <div className="min-w-0">{COPY.list.headers.tokenAddress}</div>
-                <div className="min-w-0">{COPY.list.headers.pairAddress}</div>
-                <div className="min-w-0">{COPY.list.headers.poolAge}</div>
-                <div className="min-w-0">{COPY.list.headers.liquidity}</div>
-                <div className="min-w-0">{COPY.list.headers.action}</div>
+                <div className={TABLE_HEAD_CELL}>{COPY.list.headers.chain}</div>
+                <div className={TABLE_HEAD_CELL}>{COPY.list.headers.token}</div>
+                <div className={TABLE_HEAD_CELL}>{COPY.list.headers.tokenAddress}</div>
+                <div className={TABLE_HEAD_CELL}>{COPY.list.headers.pairAddress}</div>
+                <div className={TABLE_HEAD_CELL}>{COPY.list.headers.poolAge}</div>
+                <div className={TABLE_HEAD_CELL}>{COPY.list.headers.liquidity}</div>
+                <div className={TABLE_HEAD_CELL}>{COPY.list.headers.action}</div>
               </div>
             </div>
             <div className="space-y-3 p-3">
@@ -554,40 +556,44 @@ export default function NewListingsPage() {
                           TABLE_COLS
                         )}
                       >
-                        <div className="flex w-full min-w-0 items-center justify-center gap-2">
-                          <span className={clsx("flex h-8 w-8 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
-                            <img src={CHAIN_ICONS[item.chain]} alt={item.chain} className="h-4 w-4" />
-                          </span>
-                          <span className={clsx("font-semibold", style.text)}>{item.chain}</span>
-                        </div>
-                        <div className="flex w-full min-w-0 items-center justify-center gap-3">
-                          <span className={clsx("flex h-10 w-10 items-center justify-center rounded-full bg-white ring-1 ring-slate-200 text-sm font-semibold", style.icon)}>
-                            {tokenInitial}
-                          </span>
-                          <div className="min-w-0">
-                            <div className="truncate text-center font-semibold text-slate-900">{item.token_symbol}</div>
+                        <div className={TABLE_BODY_CELL}>
+                          <div className="flex items-center gap-2">
+                            <span className={clsx("flex h-8 w-8 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
+                              <img src={CHAIN_ICONS[item.chain]} alt={item.chain} className="h-4 w-4" />
+                            </span>
+                            <span className={clsx("font-semibold", style.text)}>{item.chain}</span>
                           </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(item.token_address)}
-                          className="group inline-flex w-full min-w-0 items-center justify-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
-                        >
-                          <span className="truncate">{truncateAddress(item.token_address)}</span>
-                          <span className="shrink-0 text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
-                            {copiedAddress === item.token_address ? "已复制" : "复制"}
-                          </span>
-                        </button>
-                        <div className="flex w-full min-w-0 justify-center font-mono text-xs text-slate-600">
-                          <span className="truncate">{truncateAddress(item.pair_address)}</span>
+                        <div className={TABLE_BODY_CELL}>
+                          <div className="flex items-center gap-3">
+                            <span className={clsx("flex h-10 w-10 items-center justify-center rounded-full bg-white ring-1 ring-slate-200 text-sm font-semibold", style.icon)}>
+                              {tokenInitial}
+                            </span>
+                            <span className="truncate text-center font-semibold text-slate-900">{item.token_symbol}</span>
+                          </div>
                         </div>
-                        <div className="flex w-full min-w-0 justify-center">
+                        <div className={TABLE_BODY_CELL}>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(item.token_address)}
+                            className="group inline-flex items-center justify-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
+                          >
+                            <span className="truncate">{truncateAddress(item.token_address)}</span>
+                            <span className="shrink-0 text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
+                              {copiedAddress === item.token_address ? "已复制" : "复制"}
+                            </span>
+                          </button>
+                        </div>
+                        <div className={TABLE_BODY_CELL}>
+                          <span className="truncate font-mono text-xs text-slate-600">{truncateAddress(item.pair_address)}</span>
+                        </div>
+                        <div className={TABLE_BODY_CELL}>
                           <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 pulse-dot" />
                             {item.pool_age}
                           </span>
                         </div>
-                        <div className="flex w-full min-w-0 justify-center">
+                        <div className={TABLE_BODY_CELL}>
                           <span
                             className={clsx(
                               "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
@@ -597,7 +603,7 @@ export default function NewListingsPage() {
                             未检测
                           </span>
                         </div>
-                        <div className="flex w-full min-w-0 justify-center">
+                        <div className={TABLE_BODY_CELL}>
                           <Link
                             href={`/scan?token_address=${encodeURIComponent(item.token_address)}`}
                             className="inline-flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"

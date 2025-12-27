@@ -183,6 +183,8 @@ const CHAIN_TABS: { id: ChainTabId; label: string }[] = [
   { id: "Arbitrum", label: "Ars" },
 ];
 
+const TABLE_COLS = "grid-cols-[140px_180px_minmax(180px,1fr)_minmax(180px,1fr)_120px_120px_120px_140px]";
+
 const HEAT_RANGES: { id: HeatRangeId; label: string }[] = [
   { id: "7d", label: "7d" },
   { id: "24h", label: "24h" },
@@ -513,7 +515,12 @@ export default function NewListingsPage() {
           <p className="mt-2 text-sm text-slate-600">{COPY.list.subtitle}</p>
 
           <div className="mt-4 rounded-2xl border border-slate-200 bg-white/90">
-            <div className="hidden md:grid grid-cols-[140px_170px_1fr_1fr_120px_120px_140px_140px] gap-3 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-4 py-3 text-xs font-semibold text-slate-500">
+            <div
+              className={clsx(
+                "hidden md:grid gap-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-6 py-3 text-xs font-semibold text-slate-500",
+                TABLE_COLS
+              )}
+            >
               <div>{COPY.list.headers.chain}</div>
               <div>{COPY.list.headers.token}</div>
               <div>{COPY.list.headers.tokenAddress}</div>
@@ -541,7 +548,7 @@ export default function NewListingsPage() {
                       style={{ animationDelay: `${index * 80}ms` }}
                     >
                       <span className={clsx("absolute left-0 top-0 h-full w-1.5", style.bar)} />
-                      <div className="hidden md:grid grid-cols-[140px_170px_1fr_1fr_120px_120px_140px_140px] items-center gap-3 pl-8 text-sm text-slate-700">
+                      <div className={clsx("hidden md:grid items-center gap-4 pl-8 pr-6 text-sm text-slate-700", TABLE_COLS)}>
                         <div className="flex items-center gap-2">
                           <span className={clsx("flex h-8 w-8 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
                             <img src={CHAIN_ICONS[item.chain]} alt={item.chain} className="h-4 w-4" />
@@ -559,14 +566,16 @@ export default function NewListingsPage() {
                         <button
                           type="button"
                           onClick={() => handleCopy(item.token_address)}
-                          className="group inline-flex items-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
+                          className="group inline-flex w-full items-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
                         >
-                          {truncateAddress(item.token_address)}
+                          <span className="truncate">{truncateAddress(item.token_address)}</span>
                           <span className="text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
                             {copiedAddress === item.token_address ? "已复制" : "复制"}
                           </span>
                         </button>
-                        <div className="font-mono text-xs text-slate-600">{truncateAddress(item.pair_address)}</div>
+                        <div className="w-full font-mono text-xs text-slate-600">
+                          <span className="truncate">{truncateAddress(item.pair_address)}</span>
+                        </div>
                         <div>
                           <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 pulse-dot" />

@@ -523,10 +523,10 @@ export default function NewListingsPage() {
               >
                 <div className="min-w-0">{COPY.list.headers.chain}</div>
                 <div className="min-w-0">{COPY.list.headers.token}</div>
-                <div className="min-w-0">{COPY.list.headers.tokenAddress}</div>
+                <div className="min-w-0 text-left">{COPY.list.headers.tokenAddress}</div>
                 <div className="min-w-0">{COPY.list.headers.pairAddress}</div>
                 <div className="min-w-0">{COPY.list.headers.poolAge}</div>
-                <div className="min-w-0">{COPY.list.headers.liquidity}</div>
+                <div className="min-w-0 text-left">{COPY.list.headers.liquidity}</div>
                 <div className="min-w-0">{COPY.list.headers.action}</div>
               </div>
             </div>
@@ -571,10 +571,10 @@ export default function NewListingsPage() {
                         <button
                           type="button"
                           onClick={() => handleCopy(item.token_address)}
-                          className="group inline-flex w-full min-w-0 items-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
+                          className="group inline-flex w-full min-w-0 items-center justify-between gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
                         >
                           <span className="truncate">{truncateAddress(item.token_address)}</span>
-                          <span className="text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
+                          <span className="shrink-0 text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
                             {copiedAddress === item.token_address ? "已复制" : "复制"}
                           </span>
                         </button>
@@ -587,7 +587,7 @@ export default function NewListingsPage() {
                             {item.pool_age}
                           </span>
                         </div>
-                        <div className="min-w-0">
+                        <div className="flex w-full min-w-0 justify-start">
                           <span
                             className={clsx(
                               "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
@@ -651,10 +651,10 @@ export default function NewListingsPage() {
                             <button
                               type="button"
                               onClick={() => handleCopy(item.token_address)}
-                              className="group inline-flex items-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
+                              className="group inline-flex items-center justify-between gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
                             >
                               {truncateAddress(item.token_address)}
-                              <span className="text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
+                              <span className="shrink-0 text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
                                 {copiedAddress === item.token_address ? "已复制" : "复制"}
                               </span>
                             </button>

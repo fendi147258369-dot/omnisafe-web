@@ -516,7 +516,7 @@ export default function NewListingsPage() {
           <div className="mt-4 rounded-2xl border border-slate-200 bg-white/90">
             <div
               className={clsx(
-                "hidden md:grid gap-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-6 py-3 text-xs font-semibold text-slate-500",
+                "hidden md:grid justify-items-start gap-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-6 py-3 text-left text-xs font-semibold text-slate-500",
                 TABLE_COLS
               )}
             >
@@ -546,7 +546,12 @@ export default function NewListingsPage() {
                       style={{ animationDelay: `${index * 80}ms` }}
                     >
                       <span className={clsx("absolute left-0 top-0 h-full w-1.5", style.bar)} />
-                      <div className={clsx("hidden md:grid items-center gap-4 pl-8 pr-6 text-sm text-slate-700", TABLE_COLS)}>
+                      <div
+                        className={clsx(
+                          "hidden md:grid items-center justify-items-start gap-4 pl-8 pr-6 text-left text-sm text-slate-700",
+                          TABLE_COLS
+                        )}
+                      >
                         <div className="flex items-center gap-2">
                           <span className={clsx("flex h-8 w-8 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
                             <img src={CHAIN_ICONS[item.chain]} alt={item.chain} className="h-4 w-4" />

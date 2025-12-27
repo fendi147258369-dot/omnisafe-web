@@ -28,7 +28,7 @@ const COPY = {
       pairAddress: "交易池地址",
       poolAge: "池龄",
       createdAt: "创建时间",
-      liquidity: "初始流动性",
+      liquidity: "状态",
       action: "操作",
     },
     actionLabel: "查看池子",
@@ -419,14 +419,6 @@ export default function NewListingsPage() {
                           </span>
                           <div>
                             <div className="font-semibold text-slate-900">{item.token_symbol}</div>
-                            <span
-                              className={clsx(
-                                "mt-1 inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold",
-                                riskBadgeClass(item.risk_hint)
-                              )}
-                            >
-                              {item.risk_hint}
-                            </span>
                           </div>
                         </div>
                         <div className="font-mono text-xs text-slate-600">{truncateAddress(item.token_address)}</div>
@@ -438,8 +430,15 @@ export default function NewListingsPage() {
                           </span>
                         </div>
                         <div className="text-xs font-semibold text-slate-700">{item.created_at}</div>
-                        <div className={clsx("font-semibold", item.liquidity_usd ? "text-slate-900" : "text-slate-400")}>
-                          {item.liquidity_usd ?? "--"}
+                        <div>
+                          <span
+                            className={clsx(
+                              "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
+                              riskBadgeClass("未检测")
+                            )}
+                          >
+                            未检测
+                          </span>
                         </div>
                         <div>
                           <Link
@@ -470,14 +469,6 @@ export default function NewListingsPage() {
                               <div className={clsx("text-xs", style.text)}>{item.chain}</div>
                             </div>
                           </div>
-                          <span
-                            className={clsx(
-                              "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold",
-                              riskBadgeClass(item.risk_hint)
-                            )}
-                          >
-                            {item.risk_hint}
-                          </span>
                         </div>
                         <div className="grid gap-2 text-xs text-slate-500">
                           <div className="flex items-center justify-between">
@@ -493,8 +484,13 @@ export default function NewListingsPage() {
                           </div>
                           <div className="flex items-center justify-between">
                             <span>{COPY.list.headers.liquidity}</span>
-                            <span className={clsx("font-semibold", item.liquidity_usd ? "text-slate-700" : "text-slate-400")}>
-                              {item.liquidity_usd ?? "--"}
+                            <span
+                              className={clsx(
+                                "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
+                                riskBadgeClass("未检测")
+                              )}
+                            >
+                              未检测
                             </span>
                           </div>
                           <div>

@@ -472,7 +472,7 @@ export default function NewListingsPage() {
               <div className="hidden md:grid grid-cols-[160px_1fr_140px] gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-500">
                 <div>{COPY.list.headers.chain}</div>
                 <div>{COPY.list.headers.pairAddress}</div>
-                <div>{COPY.list.headers.createdAt}</div>
+                <div>池龄</div>
               </div>
               <div className="space-y-2 p-3">
                 {trendPools.length === 0 ? (

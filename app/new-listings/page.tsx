@@ -514,19 +514,21 @@ export default function NewListingsPage() {
           <p className="mt-2 text-sm text-slate-600">{COPY.list.subtitle}</p>
 
           <div className="mt-4 rounded-2xl border border-slate-200 bg-white/90">
-            <div
-              className={clsx(
-                "hidden md:grid justify-items-start gap-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-6 py-3 text-left text-xs font-semibold text-slate-500",
-                TABLE_COLS
-              )}
-            >
-              <div>{COPY.list.headers.chain}</div>
-              <div>{COPY.list.headers.token}</div>
-              <div>{COPY.list.headers.tokenAddress}</div>
-              <div>{COPY.list.headers.pairAddress}</div>
-              <div>{COPY.list.headers.poolAge}</div>
-              <div>{COPY.list.headers.liquidity}</div>
-              <div>{COPY.list.headers.action}</div>
+            <div className="px-3">
+              <div
+                className={clsx(
+                  "hidden md:grid justify-items-start gap-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-6 py-3 text-left text-xs font-semibold text-slate-500",
+                  TABLE_COLS
+                )}
+              >
+                <div className="min-w-0">{COPY.list.headers.chain}</div>
+                <div className="min-w-0">{COPY.list.headers.token}</div>
+                <div className="min-w-0">{COPY.list.headers.tokenAddress}</div>
+                <div className="min-w-0">{COPY.list.headers.pairAddress}</div>
+                <div className="min-w-0">{COPY.list.headers.poolAge}</div>
+                <div className="min-w-0">{COPY.list.headers.liquidity}</div>
+                <div className="min-w-0">{COPY.list.headers.action}</div>
+              </div>
             </div>
             <div className="space-y-3 p-3">
               {displayListings.length === 0 ? (
@@ -552,40 +554,40 @@ export default function NewListingsPage() {
                           TABLE_COLS
                         )}
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
                           <span className={clsx("flex h-8 w-8 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
                             <img src={CHAIN_ICONS[item.chain]} alt={item.chain} className="h-4 w-4" />
                           </span>
                           <span className={clsx("font-semibold", style.text)}>{item.chain}</span>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex min-w-0 items-center gap-3">
                           <span className={clsx("flex h-10 w-10 items-center justify-center rounded-full bg-white ring-1 ring-slate-200 text-sm font-semibold", style.icon)}>
                             {tokenInitial}
                           </span>
-                          <div>
-                            <div className="font-semibold text-slate-900">{item.token_symbol}</div>
+                          <div className="min-w-0">
+                            <div className="truncate font-semibold text-slate-900">{item.token_symbol}</div>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopy(item.token_address)}
-                          className="group inline-flex w-full items-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
+                          className="group inline-flex w-full min-w-0 items-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
                         >
                           <span className="truncate">{truncateAddress(item.token_address)}</span>
                           <span className="text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
                             {copiedAddress === item.token_address ? "已复制" : "复制"}
                           </span>
                         </button>
-                        <div className="w-full font-mono text-xs text-slate-600">
+                        <div className="w-full min-w-0 font-mono text-xs text-slate-600">
                           <span className="truncate">{truncateAddress(item.pair_address)}</span>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 pulse-dot" />
                             {item.pool_age}
                           </span>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <span
                             className={clsx(
                               "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
@@ -595,7 +597,7 @@ export default function NewListingsPage() {
                             未检测
                           </span>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <Link
                             href={`/scan?token_address=${encodeURIComponent(item.token_address)}`}
                             className="inline-flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"

@@ -182,7 +182,7 @@ const CHAIN_TABS: { id: ChainTabId; label: string }[] = [
   { id: "Arbitrum", label: "Ars" },
 ];
 
-const TABLE_COLS = "grid-cols-[120px_160px_minmax(150px,1fr)_minmax(150px,1fr)_120px_120px_120px]";
+const TABLE_COLS = "grid-cols-[120px_170px_minmax(0,1fr)_minmax(0,1fr)_130px_120px_140px]";
 const TABLE_HEAD_CELL = "flex w-full min-w-0 items-center justify-center";
 const TABLE_BODY_CELL = "flex w-full min-w-0 items-center justify-center";
 

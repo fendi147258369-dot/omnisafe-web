@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../../components/layout/AppShell";
 
 const COPY = {
@@ -16,6 +16,8 @@ const COPY = {
     title: "近7日池子创建活跃榜",
     subtitle: "按代币池子创建次数排序（非价格、非热度）",
     rangeLabel: "时间筛选",
+    poolsTitle: "近7日新建池子",
+    poolsEmpty: "暂无该代币近7日池子记录",
   },
   list: {
     title: "今日新建交易池",
@@ -62,6 +64,14 @@ type TrendCard = {
 type HeatRangeId = "7d" | "24h";
 
 type ChainTabId = Listing["chain"];
+
+type TrendPool = {
+  chain: Listing["chain"];
+  token_symbol: string;
+  token_address: string;
+  pair_address: string;
+  created_at: string;
+};
 
 const API_ENDPOINT = "/api/new-listings";
 
@@ -119,6 +129,52 @@ const MOCK_TRENDS: TrendCard[] = [
     last_active: "3 分钟前",
   },
 ];
+
+const MOCK_TREND_POOLS: Record<string, TrendPool[]> = {
+  TURBO: [
+    {
+      chain: "Ethereum",
+      token_symbol: "TURBO",
+      token_address: "0x4f7c0f0a2b6c3f8ad2fb1d8e7a6f7b2c4d9a8e10",
+      pair_address: "0x6e7a8b9c0d1e2f30405060718293a4b5c6d7e8f9",
+      created_at: "12 分钟前",
+    },
+    {
+      chain: "BSC",
+      token_symbol: "TURBO",
+      token_address: "0x9b7a6c5d4e3f2019182736455647382910abcd12",
+      pair_address: "0x7c8d9e0f1a2b3c4d5e6f70819283746556473829",
+      created_at: "38 分钟前",
+    },
+  ],
+  OOZI: [
+    {
+      chain: "Base",
+      token_symbol: "OOZI",
+      token_address: "0x8e7d6c5b4a3928171615141312111000ffeedcba",
+      pair_address: "0x0f1e2d3c4b5a69788796a5b4c3d2e1f0a9b8c7d6",
+      created_at: "1 小时前",
+    },
+  ],
+  $BANANA: [
+    {
+      chain: "BSC",
+      token_symbol: "$BANANA",
+      token_address: "0x8b7a6c5d4e3f2019182736455647382910abcdee",
+      pair_address: "0x4a5b6c7d8e9f0011223344556677889900aabbcc",
+      created_at: "2 小时前",
+    },
+  ],
+  LIZARD: [
+    {
+      chain: "Ethereum",
+      token_symbol: "LIZARD",
+      token_address: "0x1a2b3c4d5e6f7081928374655647382910abcdff",
+      pair_address: "0x11223344556677889900aabbccddeeff00112233",
+      created_at: "3 小时前",
+    },
+  ],
+};
 
 const CHAIN_TABS: { id: ChainTabId; label: string }[] = [
   { id: "Ethereum", label: "Ethereum" },
@@ -195,12 +251,44 @@ export default function NewListingsPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [activeChain, setActiveChain] = useState<ChainTabId>("Ethereum");
   const [heatRange, setHeatRange] = useState<HeatRangeId>("7d");
+  const [activeTrendToken, setActiveTrendToken] = useState<string | null>(
+    MOCK_TRENDS[0]?.token_symbol ?? null
+  );
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     getNewListings().then(setListings);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleCopy = async (value: string) => {
+    if (!navigator?.clipboard) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedAddress(value);
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+      copyTimerRef.current = setTimeout(() => {
+        setCopiedAddress(null);
+      }, 1600);
+    } catch (error) {
+      console.error("Copy failed", error);
+    }
+  };
+
   const displayListings = listings;
+  const trendPools = activeTrendToken ? MOCK_TREND_POOLS[activeTrendToken] ?? [] : [];
 
   return (
     <AppShell>
@@ -282,7 +370,8 @@ export default function NewListingsPage() {
                   className={clsx(
                     "rank-card relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br p-4 shadow-sm",
                     style.card,
-                    item.featured && "ring-1 ring-amber-200"
+                    item.featured && "ring-1 ring-amber-200",
+                    activeTrendToken === item.token_symbol && "ring-1 ring-indigo-200"
                   )}
                   style={{ animationDelay: `${index * 90}ms` }}
                 >
@@ -310,6 +399,7 @@ export default function NewListingsPage() {
                       <>
                         <button
                           type="button"
+                          onClick={() => setActiveTrendToken(item.token_symbol)}
                           className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
                         >
                           查看代币
@@ -346,6 +436,7 @@ export default function NewListingsPage() {
                         </span>
                         <button
                           type="button"
+                          onClick={() => setActiveTrendToken(item.token_symbol)}
                           className="ml-auto inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"
                         >
                           查看代币
@@ -366,6 +457,50 @@ export default function NewListingsPage() {
               );
             })}
           </div>
+
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white/90 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-sm font-semibold text-slate-900">
+                {activeTrendToken ? `${activeTrendToken} · ${COPY.ranking.poolsTitle}` : COPY.ranking.poolsTitle}
+              </div>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
+                {trendPools.length} 条
+              </span>
+            </div>
+            <div className="mt-3 rounded-xl border border-slate-200">
+              <div className="hidden md:grid grid-cols-[160px_1fr_140px] gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-500">
+                <div>{COPY.list.headers.chain}</div>
+                <div>{COPY.list.headers.pairAddress}</div>
+                <div>{COPY.list.headers.createdAt}</div>
+              </div>
+              <div className="space-y-2 p-3">
+                {trendPools.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">
+                    {COPY.ranking.poolsEmpty}
+                  </div>
+                ) : (
+                  trendPools.map((pool) => {
+                    const style = CHAIN_STYLES[pool.chain];
+                    return (
+                      <div
+                        key={`${pool.chain}-${pool.pair_address}`}
+                        className="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 md:grid-cols-[160px_1fr_140px] md:items-center"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={clsx("flex h-7 w-7 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
+                            <img src={CHAIN_ICONS[pool.chain]} alt={pool.chain} className="h-4 w-4" />
+                          </span>
+                          <span className={clsx("font-semibold", style.text)}>{pool.chain}</span>
+                        </div>
+                        <div className="font-mono text-xs text-slate-600">{truncateAddress(pool.pair_address)}</div>
+                        <div className="text-xs font-semibold text-slate-700">{pool.created_at}</div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="rounded-3xl border border-slate-200 bg-white/85 p-5 shadow-sm">
@@ -378,7 +513,7 @@ export default function NewListingsPage() {
           <p className="mt-2 text-sm text-slate-600">{COPY.list.subtitle}</p>
 
           <div className="mt-4 rounded-2xl border border-slate-200 bg-white/90">
-            <div className="hidden md:grid grid-cols-[140px_170px_1fr_1fr_120px_120px_140px_140px] gap-3 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 px-5 py-3 text-xs font-semibold text-slate-500">
+            <div className="hidden md:grid grid-cols-[140px_170px_1fr_1fr_120px_120px_140px_140px] gap-3 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50 pl-8 pr-4 py-3 text-xs font-semibold text-slate-500">
               <div>{COPY.list.headers.chain}</div>
               <div>{COPY.list.headers.token}</div>
               <div>{COPY.list.headers.tokenAddress}</div>
@@ -406,7 +541,7 @@ export default function NewListingsPage() {
                       style={{ animationDelay: `${index * 80}ms` }}
                     >
                       <span className={clsx("absolute left-0 top-0 h-full w-1.5", style.bar)} />
-                      <div className="hidden md:grid grid-cols-[140px_170px_1fr_1fr_120px_120px_140px_140px] items-center gap-3 pl-4 text-sm text-slate-700">
+                      <div className="hidden md:grid grid-cols-[140px_170px_1fr_1fr_120px_120px_140px_140px] items-center gap-3 pl-8 text-sm text-slate-700">
                         <div className="flex items-center gap-2">
                           <span className={clsx("flex h-8 w-8 items-center justify-center rounded-full bg-white ring-1 ring-slate-200", style.icon)}>
                             <img src={CHAIN_ICONS[item.chain]} alt={item.chain} className="h-4 w-4" />
@@ -421,7 +556,16 @@ export default function NewListingsPage() {
                             <div className="font-semibold text-slate-900">{item.token_symbol}</div>
                           </div>
                         </div>
-                        <div className="font-mono text-xs text-slate-600">{truncateAddress(item.token_address)}</div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(item.token_address)}
+                          className="group inline-flex items-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
+                        >
+                          {truncateAddress(item.token_address)}
+                          <span className="text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
+                            {copiedAddress === item.token_address ? "已复制" : "复制"}
+                          </span>
+                        </button>
                         <div className="font-mono text-xs text-slate-600">{truncateAddress(item.pair_address)}</div>
                         <div>
                           <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
@@ -493,9 +637,18 @@ export default function NewListingsPage() {
                               未检测
                             </span>
                           </div>
-                          <div>
-                            {COPY.list.headers.tokenAddress}: {" "}
-                            <span className="font-mono text-slate-600">{truncateAddress(item.token_address)}</span>
+                          <div className="flex items-center justify-between">
+                            <span>{COPY.list.headers.tokenAddress}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(item.token_address)}
+                              className="group inline-flex items-center gap-2 font-mono text-xs text-slate-600 transition hover:text-slate-900"
+                            >
+                              {truncateAddress(item.token_address)}
+                              <span className="text-[11px] font-semibold text-slate-400 group-hover:text-slate-500">
+                                {copiedAddress === item.token_address ? "已复制" : "复制"}
+                              </span>
+                            </button>
                           </div>
                           <div>
                             {COPY.list.headers.pairAddress}: {" "}

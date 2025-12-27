@@ -183,7 +183,7 @@ const CHAIN_TABS: { id: ChainTabId; label: string }[] = [
   { id: "Arbitrum", label: "Ars" },
 ];
 
-const TABLE_COLS = "grid-cols-[140px_180px_minmax(180px,1fr)_minmax(180px,1fr)_120px_120px_120px_140px]";
+const TABLE_COLS = "grid-cols-[120px_160px_minmax(140px,1fr)_minmax(140px,1fr)_110px_110px_110px_120px]";
 
 const HEAT_RANGES: { id: HeatRangeId; label: string }[] = [
   { id: "7d", label: "7d" },
@@ -543,7 +543,7 @@ export default function NewListingsPage() {
                     <div
                       key={`${item.chain}-${item.token_address}`}
                       className={clsx(
-                        "table-row group relative overflow-hidden rounded-2xl border border-slate-200 bg-white/95 px-4 py-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                        "table-row group relative overflow-hidden rounded-2xl border border-slate-200 bg-white/95 py-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
                       )}
                       style={{ animationDelay: `${index * 80}ms` }}
                     >
